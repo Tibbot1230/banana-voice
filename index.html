@@ -1276,3 +1276,106 @@
   </script>
 </body>
 </html>
+   
+<!-- CUTE VOICE LEVEL SYSTEM -->
+<style>
+.level-card {
+  background: linear-gradient(135deg,#39106f,#9b35d8);
+  color: white;
+  padding: 16px;
+  border-radius: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 12px 0;
+  font-family: Arial;
+  cursor: pointer;
+}
+.level-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+.level-number {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 8px 0;
+}
+.level-progress {
+  background: #ffffff55;
+  height: 9px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.level-progress-fill {
+  background: #ffd700;
+  height: 100%;
+  width: 0%;
+  transition: .4s;
+}
+.level-info {
+  display: none;
+  background: #fff;
+  color: #222;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+</style>
+
+<div class="level-card" onclick="showLevelDetails()">
+  <div class="level-title">🏆 CUTE VOICE LEVEL</div>
+  <div class="level-number">
+    Level <span id="userLevel">1</span>
+  </div>
+  <div>⭐ EXP: <span id="userExp">0</span></div>
+  <div class="level-progress">
+    <div class="level-progress-fill" id="levelProgress"></div>
+  </div>
+  <div id="nextExp" style="margin-top:8px">
+    Next Level: 100 EXP
+  </div>
+  <div class="level-info" id="levelDetails">
+    <b>🎖️ Level Details</b>
+    <p id="levelDescription"></p>
+    <p id="levelRequirement"></p>
+  </div>
+</div>
+
+<script>
+let cuteExp = Number(localStorage.getItem("cuteExp")) || 0;
+
+function updateLevel() {
+  let level = Math.floor(cuteExp / 100) + 1;
+  let current = cuteExp % 100;
+
+  document.getElementById("userLevel").innerText = level;
+  document.getElementById("userExp").innerText = cuteExp;
+
+  document.getElementById("levelProgress").style.width =
+    current + "%";
+
+  document.getElementById("nextExp").innerText =
+    (100-current) + " EXP needed for next level";
+
+  document.getElementById("levelDescription").innerText =
+    "You are currently at Level " + level;
+
+  document.getElementById("levelRequirement").innerText =
+    "Total EXP: " + cuteExp;
+  
+  localStorage.setItem("cuteExp", cuteExp);
+}
+
+function showLevelDetails() {
+  let box = document.getElementById("levelDetails");
+  box.style.display =
+    box.style.display === "block" ? "none" : "block";
+  updateLevel();
+}
+
+function addCuteExp(amount) {
+  cuteExp += amount;
+  updateLevel();
+}
+
+updateLevel();
+</script>
