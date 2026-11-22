@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🍌 Banana Voice Live</title>
+  <title>🍌 Banana Voice Room (Live)</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
+      --bg: #0b1120;
+      --card: #162032;
       --accent: #facc15;
       --accent-dark: #eab308;
+      --green: #22c55e;
+      --red: #ef4444;
       --text: #f8fafc;
       --muted: #94a3b8;
     }
@@ -22,18 +24,17 @@
     }
 
     body {
-      background: radial-gradient(circle at top, #1e293b, #090d16);
+      background: radial-gradient(circle at top, #1e293b, #070b14);
       color: var(--text);
       min-height: 100dvh;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
     }
 
     .app {
       width: 100%;
-      max-width: 540px;
-      height: 100dvh;
+      max-width: 600px;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       padding: 14px;
@@ -44,474 +45,655 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(30, 41, 59, 0.85);
+      background: rgba(22, 32, 50, 0.9);
       border: 1px solid rgba(250, 204, 21, 0.25);
       padding: 12px 14px;
       border-radius: 16px;
-      backdrop-filter: blur(8px);
     }
 
     .brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 1.05rem;
       color: var(--accent);
     }
 
-    .controls-top {
+    .badge {
+      background: rgba(250, 204, 21, 0.15);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    /* Lobby */
+    .lobby {
+      flex: 1;
       display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      background: var(--card);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 20px;
+      padding: 22px;
+    }
+
+    .lobby h2 {
+      font-size: 1.25rem;
+      color: var(--accent);
+    }
+
+    .lobby p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .field input {
+      background: #0b1120;
+      border: 1px solid #334155;
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+    }
+
+    .btn-join {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: #0b1120;
+      border: none;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    /* Room */
+    .room-view {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .room-view.active {
+      display: flex;
+    }
+
+    .room-topbar {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
       gap: 8px;
-    }
-
-    select, button.icon-btn {
-      background: #0f172a;
-      color: var(--text);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      border-radius: 10px;
-      padding: 6px 10px;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-
-    .settings-panel {
-      display: none;
       background: var(--card);
-      border: 1px solid rgba(250, 204, 21, 0.3);
+      padding: 10px 14px;
       border-radius: 14px;
-      padding: 14px;
-      gap: 10px;
-      flex-direction: column;
-      font-size: 0.85rem;
+      border: 1px solid rgba(148, 163, 184, 0.2);
     }
 
-    .settings-panel.open {
-      display: flex;
-    }
-
-    .settings-panel input, .settings-panel select {
-      width: 100%;
-      padding: 9px 10px;
-      border-radius: 10px;
-      border: 1px solid #475569;
-      background: #0f172a;
-      color: var(--text);
+    .room-info {
       font-size: 0.9rem;
+      font-weight: 600;
     }
 
-    .settings-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #0f172a;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      flex: 1;
-    }
-
-    .btn-secondary {
+    .btn-copy {
       background: #334155;
       color: var(--text);
       border: none;
-      padding: 8px 14px;
+      padding: 7px 12px;
       border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
       cursor: pointer;
     }
 
-    .chat-box {
+    .participants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+      gap: 10px;
+    }
+
+    .user-card {
+      background: var(--card);
+      border: 2px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .user-card.speaking {
+      border-color: var(--green);
+      box-shadow: 0 0 16px rgba(34, 197, 94, 0.35);
+    }
+
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: #0b1120;
+      font-weight: 800;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .mic-state {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .mic-state.muted {
+      color: var(--red);
+    }
+
+    .mic-state.live {
+      color: var(--green);
+    }
+
+    /* Chat */
+    .chat-panel {
+      flex: 1;
+      min-height: 140px;
+      max-height: 220px;
+      background: var(--card);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      gap: 8px;
+    }
+
+    .chat-messages {
       flex: 1;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding: 6px 2px;
-    }
-
-    .msg {
-      max-width: 85%;
-      padding: 10px 14px;
-      border-radius: 16px;
-      line-height: 1.5;
-      font-size: 0.95rem;
-      word-wrap: break-word;
-    }
-
-    .msg.user {
-      align-self: flex-end;
-      background: var(--accent);
-      color: #0f172a;
-      font-weight: 500;
-      border-bottom-right-radius: 4px;
-    }
-
-    .msg.bot {
-      align-self: flex-start;
-      background: var(--card);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-bottom-left-radius: 4px;
-    }
-
-    .voice-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 0 4px;
-    }
-
-    .status-text {
+      gap: 6px;
       font-size: 0.85rem;
-      color: var(--muted);
-      min-height: 20px;
-      text-align: center;
     }
 
-    .mic-btn {
-      width: 76px;
-      height: 76px;
-      border-radius: 50%;
-      border: none;
-      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-      color: #0f172a;
-      font-size: 1.9rem;
+    .chat-line {
+      color: #e2e8f0;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .chat-line strong {
+      color: var(--accent);
+    }
+
+    .chat-input-row {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 0 22px rgba(250, 204, 21, 0.35);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      gap: 6px;
     }
 
-    .mic-btn:active {
-      transform: scale(0.95);
-    }
-
-    .mic-btn.listening {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: #fff;
-      animation: pulse 1.3s infinite;
-    }
-
-    .mic-btn.speaking {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: #fff;
-      animation: pulse 1.3s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.6); }
-      70% { box-shadow: 0 0 0 20px rgba(250, 204, 21, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
-    }
-
-    .text-bar {
-      display: flex;
-      gap: 8px;
-      width: 100%;
-    }
-
-    .text-bar input {
+    .chat-input-row input {
       flex: 1;
-      background: var(--card);
-      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: #0b1120;
+      border: 1px solid #334155;
       color: var(--text);
-      padding: 11px 14px;
-      border-radius: 14px;
-      font-size: 0.95rem;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.88rem;
       outline: none;
     }
 
-    .text-bar button {
+    .chat-input-row button {
       background: var(--accent);
-      color: #0f172a;
+      color: #0b1120;
       border: none;
-      padding: 0 18px;
-      border-radius: 14px;
+      padding: 0 14px;
+      border-radius: 10px;
       font-weight: 700;
-      font-size: 1rem;
       cursor: pointer;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-ctrl {
+      flex: 1;
+      padding: 13px;
+      border-radius: 14px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-mute {
+      background: #334155;
+      color: var(--text);
+    }
+
+    .btn-mute.is-muted {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .btn-leave {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .notice {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="app">
     <header>
-      <div class="brand">🍌 Banana Voice Live</div>
-      <div class="controls-top">
-        <select id="langSelect" aria-label="Language">
-          <option value="bn-BD">বাংলা</option>
-          <option value="en-US">English</option>
-        </select>
-        <button class="icon-btn" id="settingsToggle" title="Settings">⚙️</button>
-      </div>
+      <div class="brand">🍌 Banana Voice Room</div>
+      <div class="badge" id="headerStatus">অফলাইন</div>
     </header>
 
-    <div class="settings-panel" id="settingsPanel">
-      <label for="apiKeyInput">Gemini API Key (ঐচ্ছিক - দিলে আরও বুদ্ধিমান উত্তর পাবেন):</label>
-      <input type="password" id="apiKeyInput" placeholder="AIzaSy... (শুধু আপনার ফোনে সেভ থাকবে)" />
-      <label for="modelSelect">মডেল নির্বাচন করুন:</label>
-      <select id="modelSelect">
-        <option value="gemini-3.8-flash">Gemini 3.8 Flash (সেরা)</option>
-        <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (দ্রুত)</option>
-      </select>
-      <div class="settings-actions">
-        <button class="btn-primary" id="saveSettings">সেভ করুন</button>
-        <button class="btn-secondary" id="clearKey">Key মুছুন</button>
-      </div>
-      <span style="color: var(--muted); font-size: 0.78rem;">
-        নোট: আপনার API Key কখনো GitHub-এ আপলোড হবে না, শুধু আপনার ব্রাউজারেই থাকবে।
-      </span>
-    </div>
+    <!-- Lobby -->
+    <section class="lobby" id="lobbyView">
+      <h2>লাইভ ভয়েস রুমে যোগ দিন</h2>
+      <p>একসাথে ১০–১৫ জন বন্ধু মিলে সরাসরি ভয়েস আড্ডা দিন। একই রুমের নাম দিয়ে জয়েন করলেই সবাই একসাথে কথা বলতে পারবেন।</p>
 
-    <div class="chat-box" id="chatBox">
-      <div class="msg bot">
-        হ্যালো! আমি 🍌 Banana Voice Live। নিচের মাইক্রোফোন বাটনে চাপ দিয়ে কথা বলুন অথবা লিখে প্রশ্ন করুন।
+      <div class="field">
+        <label for="nameInput">আপনার নাম</label>
+        <input type="text" id="nameInput" placeholder="যেমন: রাকিব" maxlength="20" />
       </div>
-    </div>
 
-    <div class="voice-area">
-      <div class="status-text" id="statusText">কথা বলতে মাইক বাটনে চাপ দিন</div>
-      <button class="mic-btn" id="micBtn" aria-label="Start Voice">🎙️</button>
-
-      <div class="text-bar">
-        <input type="text" id="textInput" placeholder="অথবা এখানে লিখে পাঠান..." />
-        <button id="sendBtn">➤</button>
+      <div class="field">
+        <label for="roomInput">রুমের নাম (বা কোড)</label>
+        <input type="text" id="roomInput" placeholder="যেমন: banana-adda" maxlength="30" />
       </div>
-    </div>
+
+      <button class="btn-join" id="joinBtn">🎙️ ভয়েস রুমে জয়েন করুন</button>
+      <div class="notice" id="lobbyNotice"></div>
+    </section>
+
+    <!-- Live Room -->
+    <section class="room-view" id="roomView">
+      <div class="room-topbar">
+        <div class="room-info">🔊 <span id="roomTitle"></span> • <span id="userCount">1</span>/15 জন</div>
+        <button class="btn-copy" id="copyLinkBtn">🔗 লিঙ্ক কপি করুন</button>
+      </div>
+
+      <div class="participants-grid" id="participantsGrid"></div>
+
+      <div class="chat-panel">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="রুমে মেসেজ লিখুন..." />
+          <button id="sendChatBtn">পাঠান</button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-ctrl btn-mute" id="muteBtn">🎙️ মিউট করুন</button>
+        <button class="btn-ctrl btn-leave" id="leaveBtn">🚪 বের হন</button>
+      </div>
+      <div class="notice" id="roomNotice">কথা বলার জন্য বন্ধুদের সাথে ইনভাইট লিঙ্ক শেয়ার করুন।</div>
+    </section>
   </div>
 
-  <script>
-    const chatBox = document.getElementById("chatBox");
-    const micBtn = document.getElementById("micBtn");
-    const statusText = document.getElementById("statusText");
-    const textInput = document.getElementById("textInput");
-    const sendBtn = document.getElementById("sendBtn");
-    const langSelect = document.getElementById("langSelect");
-    const settingsToggle = document.getElementById("settingsToggle");
-    const settingsPanel = document.getElementById("settingsPanel");
-    const apiKeyInput = document.getElementById("apiKeyInput");
-    const modelSelect = document.getElementById("modelSelect");
-    const saveSettingsBtn = document.getElementById("saveSettings");
-    const clearKeyBtn = document.getElementById("clearKey");
+  <div id="audioContainer" style="display:none;"></div>
 
-    let isListening = false;
-    let recognition = null;
-    const history = [];
+  <script type="module">
+    import { joinRoom } from "https://esm.run/trystero";
 
-    apiKeyInput.value = localStorage.getItem("banana_api_key") || "";
-    const savedModel = localStorage.getItem("banana_model");
-    if (savedModel) modelSelect.value = savedModel;
+    const lobbyView = document.getElementById("lobbyView");
+    const roomView = document.getElementById("roomView");
+    const headerStatus = document.getElementById("headerStatus");
+    const nameInput = document.getElementById("nameInput");
+    const roomInput = document.getElementById("roomInput");
+    const joinBtn = document.getElementById("joinBtn");
+    const lobbyNotice = document.getElementById("lobbyNotice");
+    const roomTitle = document.getElementById("roomTitle");
+    const userCount = document.getElementById("userCount");
+    const copyLinkBtn = document.getElementById("copyLinkBtn");
+    const participantsGrid = document.getElementById("participantsGrid");
+    const chatMessages = document.getElementById("chatMessages");
+    const chatInput = document.getElementById("chatInput");
+    const sendChatBtn = document.getElementById("sendChatBtn");
+    const muteBtn = document.getElementById("muteBtn");
+    const leaveBtn = document.getElementById("leaveBtn");
+    const roomNotice = document.getElementById("roomNotice");
+    const audioContainer = document.getElementById("audioContainer");
 
-    settingsToggle.addEventListener("click", () => {
-      settingsPanel.classList.toggle("open");
-    });
+    // Pre-fill room from URL ?room=xyz
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramRoom = urlParams.get("room");
+    roomInput.value = paramRoom || "banana-adda";
+    nameInput.value = localStorage.getItem("banana_room_name") || "";
 
-    saveSettingsBtn.addEventListener("click", () => {
-      localStorage.setItem("banana_api_key", apiKeyInput.value.trim());
-      localStorage.setItem("banana_model", modelSelect.value);
-      settingsPanel.classList.remove("open");
-      statusText.textContent = apiKeyInput.value.trim()
-        ? "Gemini AI মোড চালু হয়েছে ✅"
-        : "ডেমো ভয়েস মোড চালু রয়েছে ✅";
-    });
+    let room = null;
+    let myUserId = null;
+    let myName = "";
+    let currentRoomName = "";
+    let localStream = null;
+    let isMuted = false;
+    let isSpeaking = false;
+    let memberState = null;
+    let chatAction = null;
+    let audioCtx = null;
+    let speakInterval = null;
+    const connectedUsers = new Set();
+    const audioElements = new Map();
 
-    clearKeyBtn.addEventListener("click", () => {
-      localStorage.removeItem("banana_api_key");
-      apiKeyInput.value = "";
-      statusText.textContent = "API Key মুছে ফেলা হয়েছে।";
-    });
-
-    function addMessage(text, sender) {
+    function addSystemChat(text) {
       const div = document.createElement("div");
-      div.className = `msg ${sender}`;
+      div.className = "chat-line";
+      div.style.color = "#94a3b8";
       div.textContent = text;
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function cleanForSpeech(text) {
-      return text.replace(/[*#_`~]/g, "").trim();
+    function addChatMessage(sender, text) {
+      const div = document.createElement("div");
+      div.className = "chat-line";
+      const strong = document.createElement("strong");
+      strong.textContent = sender + ": ";
+      const span = document.createElement("span");
+      span.textContent = text;
+      div.appendChild(strong);
+      div.appendChild(span);
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function speak(text) {
-      if (!("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
+    function renderParticipants() {
+      participantsGrid.innerHTML = "";
+      const allStates = memberState ? memberState.getAll() : {};
+      const ids = [myUserId, ...Array.from(connectedUsers)].filter(Boolean);
+      const uniqueIds = [...new Set(ids)];
 
-      const utter = new SpeechSynthesisUtterance(cleanForSpeech(text));
-      const lang = langSelect.value;
-      utter.lang = lang;
+      userCount.textContent = uniqueIds.length;
 
-      const voices = window.speechSynthesis.getVoices();
-      const shortLang = lang.split("-")[0];
-      const match = voices.find((v) => v.lang.startsWith(shortLang));
-      if (match) utter.voice = match;
+      for (const uid of uniqueIds) {
+        const info = allStates[uid] || {};
+        const displayName = uid === myUserId ? `${myName} (আপনি)` : (info.name || "অতিথি");
+        const muted = Boolean(info.muted);
+        const speaking = Boolean(info.speaking) && !muted;
 
-      micBtn.classList.remove("listening");
-      micBtn.classList.add("speaking");
-      statusText.textContent = "বলছি... 🔊";
+        const card = document.createElement("div");
+        card.className = "user-card" + (speaking ? " speaking" : "");
 
-      utter.onend = () => {
-        micBtn.classList.remove("speaking");
-        statusText.textContent = "কথা বলতে মাইক বাটনে চাপ দিন";
-      };
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.textContent = (displayName.trim()[0] || "🍌").toUpperCase();
 
-      utter.onerror = () => {
-        micBtn.classList.remove("speaking");
-        statusText.textContent = "কথা বলতে মাইক বাটনে চাপ দিন";
-      };
+        const nameEl = document.createElement("div");
+        nameEl.className = "user-name";
+        nameEl.textContent = displayName;
 
-      window.speechSynthesis.speak(utter);
+        const statusEl = document.createElement("div");
+        statusEl.className = "mic-state " + (muted ? "muted" : speaking ? "live" : "");
+        statusEl.textContent = muted ? "🔇 মিউট" : speaking ? "🔊 কথা বলছেন" : "🎙️ যুক্ত";
+
+        card.appendChild(avatar);
+        card.appendChild(nameEl);
+        card.appendChild(statusEl);
+        participantsGrid.appendChild(card);
+      }
     }
 
-    function demoReply(promptText) {
-      const q = promptText.toLowerCase();
-      const isBn = langSelect.value.startsWith("bn");
-
-      if (q.includes("সময়") || q.includes("কটা বাজে") || q.includes("time")) {
-        const now = new Date().toLocaleTimeString("bn-BD", { hour: "2-digit", minute: "2-digit" });
-        return isBn ? `এখন সময় ${now}।` : `The current time is ${new Date().toLocaleTimeString()}.`;
+    function attachAudio(userId, stream) {
+      let audio = audioElements.get(userId);
+      if (!audio) {
+        audio = document.createElement("audio");
+        audio.autoplay = true;
+        audio.playsInline = true;
+        audioContainer.appendChild(audio);
+        audioElements.set(userId, audio);
       }
-      if (q.includes("তারিখ") || q.includes("date") || q.includes("আজ কি বার")) {
-        const today = new Date().toLocaleDateString("bn-BD", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-        return isBn ? `আজ ${today}।` : `Today is ${new Date().toDateString()}.`;
-      }
-      if (q.includes("হ্যালো") || q.includes("হাই") || q.includes("hello") || q.includes("hi") || q.includes("কেমন আছো")) {
-        return isBn
-          ? "হ্যালো! আমি ভালো আছি। আমি আপনার ব্যানানা ভয়েস অ্যাসিস্ট্যান্ট। কীভাবে সাহায্য করতে পারি?"
-          : "Hello! I am Banana Voice Live. How can I help you today?";
-      }
-      if (q.includes("নাম কি") || q.includes("তুমি কে") || q.includes("who are you")) {
-        return isBn
-          ? "আমার নাম ব্যানানা ভয়েস লাইভ। আমি আপনার কথার উত্তর দিতে পারি।"
-          : "I am Banana Voice Live, your browser voice assistant.";
-      }
-
-      return isBn
-        ? `আপনি বলেছেন: "${promptText}"। আরও স্মার্ট AI উত্তর পেতে ওপরে ⚙️ সেটিংস থেকে একটি Gemini API Key যোগ করতে পারেন।`
-        : `You said: "${promptText}". Add a Gemini API key in ⚙️ Settings for full AI answers.`;
+      audio.srcObject = stream;
+      audio.play().catch(() => {
+        roomNotice.textContent = "অডিও শুনতে স্ক্রিনে একবার ট্যাপ করুন।";
+      });
     }
 
-    async function getAIResponse(userText) {
-      const apiKey = localStorage.getItem("banana_api_key");
-      const model = localStorage.getItem("banana_model") || "gemini-3.8-flash";
+    function removeAudio(userId) {
+      const audio = audioElements.get(userId);
+      if (audio) {
+        audio.srcObject = null;
+        audio.remove();
+        audioElements.delete(userId);
+      }
+    }
 
-      if (!apiKey) {
-        return demoReply(userText);
+    function startVoiceDetector(stream) {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+
+        speakInterval = setInterval(() => {
+          if (!memberState) return;
+          if (isMuted) {
+            if (isSpeaking) {
+              isSpeaking = false;
+              memberState.set({ name: myName, muted: true, speaking: false });
+            }
+            return;
+          }
+          analyser.getByteFrequencyData(data);
+          let sum = 0;
+          for (let i = 0; i < data.length; i++) sum += data[i];
+          const avg = sum / data.length;
+          const nowSpeaking = avg > 14;
+          if (nowSpeaking !== isSpeaking) {
+            isSpeaking = nowSpeaking;
+            memberState.set({ name: myName, muted: isMuted, speaking: isSpeaking });
+          }
+        }, 200);
+      } catch (e) {
+        // Ignore if AudioContext fails on restricted browser
+      }
+    }
+
+    joinBtn.addEventListener("click", async () => {
+      myName = nameInput.value.trim() || "বন্ধু";
+      currentRoomName = roomInput.value.trim().toLowerCase().replace(/\s+/g, "-");
+      if (!currentRoomName) {
+        lobbyNotice.textContent = "অনুগ্রহ করে একটি রুমের নাম লিখুন।";
+        return;
       }
 
-      history.push({ role: "user", parts: [{ text: userText }] });
-      const recentHistory = history.slice(-8);
+      localStorage.setItem("banana_room_name", myName);
+      joinBtn.disabled = true;
+      joinBtn.textContent = "যুক্ত হচ্ছি...";
+      lobbyNotice.textContent = "";
 
       try {
-        statusText.textContent = "চিন্তা করছি... ⏳";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
-
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            systemInstruction: {
-              parts: [{
-                text: "You are Banana Voice Live, a friendly and concise voice assistant. Keep answers short (1-3 sentences) and natural for speaking aloud. Reply in the user's language (Bengali or English)."
-              }]
-            },
-            contents: recentHistory
-          })
+        localStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          },
+          video: false
         });
-
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error?.message || "API Error");
-        }
-
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "দুঃখিত, উত্তর পাওয়া যায়নি।";
-        history.push({ role: "model", parts: [{ text: reply }] });
-        return reply;
+        isMuted = false;
       } catch (err) {
-        return `সমস্যা হয়েছে: ${err.message}`;
+        localStream = null;
+        isMuted = true;
+        lobbyNotice.textContent = "মাইক্রোফোন অনুমতি না পাওয়ায় শুধু শোনার মোডে যুক্ত হচ্ছেন।";
+      }
+
+      room = joinRoom(
+        {
+          appId: "tibbot1230/banana-voice-room",
+          maxUsers: 16,
+          identity: "none"
+        },
+        currentRoomName
+      );
+
+      const self = await room.getSelf();
+      myUserId = self.userId;
+
+      memberState = room.makeUserState("member", {
+        name: myName,
+        muted: isMuted,
+        speaking: false
+      });
+
+      chatAction = room.makeAction("chat");
+
+      // Register listeners before streaming
+      room.onPeerStream((remoteStream, { userId }) => {
+        attachAudio(userId, remoteStream);
+      });
+
+      room.onUserJoin(({ userId }) => {
+        connectedUsers.add(userId);
+        if (localStream) {
+          room.addStream(localStream, { target: userId, metadata: { type: "mic" } }).catch(() => {});
+        }
+        renderParticipants();
+        addSystemChat("• নতুন একজন রুমে যুক্ত হয়েছেন।");
+      });
+
+      room.onUserLeave(({ userId }) => {
+        connectedUsers.delete(userId);
+        removeAudio(userId);
+        renderParticipants();
+        addSystemChat("• একজন রুম থেকে বের হয়েছেন।");
+      });
+
+      room.onError((err) => {
+        if (err?.code === "room-full") {
+          roomNotice.textContent = "রুমটি পূর্ণ হয়ে গেছে (সর্বোচ্চ ১৫–১৬ জন)।";
+        }
+      });
+
+      memberState.onChange(() => {
+        renderParticipants();
+      });
+
+      chatAction.onMessage((data) => {
+        if (data?.text) addChatMessage(data.name || "অতিথি", data.text);
+      });
+
+      await memberState.set({ name: myName, muted: isMuted, speaking: false });
+
+      if (localStream) {
+        await room.addStream(localStream, { metadata: { type: "mic" } }).catch(() => {});
+        startVoiceDetector(localStream);
+      }
+
+      // Switch to room UI
+      lobbyView.style.display = "none";
+      roomView.classList.add("active");
+      headerStatus.textContent = "লাইভ 🟢";
+      roomTitle.textContent = currentRoomName;
+      updateMuteButton();
+      renderParticipants();
+      addSystemChat(`• আপনি "${currentRoomName}" রুমে যুক্ত হয়েছেন।`);
+    });
+
+    function updateMuteButton() {
+      if (!localStream) {
+        muteBtn.textContent = "🔇 মাইক নেই";
+        muteBtn.classList.add("is-muted");
+        muteBtn.disabled = true;
+        return;
+      }
+      muteBtn.disabled = false;
+      if (isMuted) {
+        muteBtn.textContent = "🔇 আনমিউট করুন";
+        muteBtn.classList.add("is-muted");
+      } else {
+        muteBtn.textContent = "🎙️ মিউট করুন";
+        muteBtn.classList.remove("is-muted");
       }
     }
 
-    async function handleUserInput(text) {
-      const clean = text.trim();
-      if (!clean) return;
-      addMessage(clean, "user");
-      const reply = await getAIResponse(clean);
-      addMessage(reply, "bot");
-      speak(reply);
+    muteBtn.addEventListener("click", () => {
+      if (!localStream) return;
+      isMuted = !isMuted;
+      localStream.getAudioTracks().forEach((t) => (t.enabled = !isMuted));
+      if (memberState) {
+        memberState.set({ name: myName, muted: isMuted, speaking: false });
+      }
+      updateMuteButton();
+      renderParticipants();
+    });
+
+    function sendChat() {
+      const msg = chatInput.value.trim();
+      if (!msg || !chatAction) return;
+      chatAction.send({ name: myName, text: msg });
+      addChatMessage(myName + " (আপনি)", msg);
+      chatInput.value = "";
     }
 
-    sendBtn.addEventListener("click", () => {
-      handleUserInput(textInput.value);
-      textInput.value = "";
+    sendChatBtn.addEventListener("click", sendChat);
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendChat();
     });
 
-    textInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        handleUserInput(textInput.value);
-        textInput.value = "";
+    copyLinkBtn.addEventListener("click", async () => {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(currentRoomName)}`;
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        copyLinkBtn.textContent = "✅ কপি হয়েছে!";
+        setTimeout(() => (copyLinkBtn.textContent = "🔗 লিঙ্ক কপি করুন"), 2000);
+      } catch {
+        prompt("এই লিঙ্কটি কপি করে বন্ধুদের দিন:", shareUrl);
       }
     });
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    micBtn.addEventListener("click", () => {
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
-
-      if (!SpeechRecognition) {
-        statusText.textContent = "এই ব্রাউজারে সরাসরি মাইক সাপোর্ট করছে না, নিচে লিখে পাঠান।";
-        return;
-      }
-
-      if (isListening && recognition) {
-        recognition.stop();
-        return;
-      }
-
-      recognition = new SpeechRecognition();
-      recognition.lang = langSelect.value;
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      recognition.onstart = () => {
-        isListening = true;
-        micBtn.classList.remove("speaking");
-        micBtn.classList.add("listening");
-        statusText.textContent = "শুনছি... এখন কথা বলুন 🎙️";
-      };
-
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        isListening = false;
-        micBtn.classList.remove("listening");
-        handleUserInput(transcript);
-      };
-
-      recognition.onerror = (event) => {
-        isListening = false;
-        micBtn.classList.remove("listening");
-        statusText.textContent =
-          event.error === "not-allowed"
-            ? "মাইক্রোফোনের অনুমতি (Permission) দিন।"
-            : "ভয়েস বুঝতে পারিনি, আবার চেষ্টা করুন।";
-      };
-
-      recognition.onend = () => {
-        isListening = false;
-        micBtn.classList.remove("listening");
-      };
-
-      recognition.start();
+    leaveBtn.addEventListener("click", async () => {
+      if (speakInterval) clearInterval(speakInterval);
+      if (audioCtx) audioCtx.close().catch(() => {});
+      if (localStream) localStream.getTracks().forEach((t) => t.stop());
+      if (room) await room.leave();
+      for (const uid of audioElements.keys()) removeAudio(uid);
+      connectedUsers.clear();
+      location.reload();
     });
   </script>
 </body>
