@@ -14,20 +14,20 @@ class ZegoConfig {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const TibbotSocialLiveApp());
+  runApp(const BananaVoiceApp());
 }
 
-class TibbotSocialLiveApp extends StatelessWidget {
-  const TibbotSocialLiveApp({super.key});
+class BananaVoiceApp extends StatelessWidget {
+  const BananaVoiceApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'তিব্বত দি অডিও লাইভ টিভি',
+      title: 'ব্যানানা ভয়েস (Banana Voice)',
       theme: ThemeData.dark(useMaterial3: true).copyWith(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purpleAccent,
+          seedColor: Colors.amber,
           brightness: Brightness.dark,
         ),
       ),
@@ -37,7 +37,7 @@ class TibbotSocialLiveApp extends StatelessWidget {
 }
 
 // ==================================================
-// ১. গিফট মডেল ও লেভেল ক্যালকুলেশন
+// ১. গিফট মডেল ও লেভেল সিস্টেম
 // ==================================================
 class GiftItem {
   final String id;
@@ -56,10 +56,11 @@ class GiftItem {
 }
 
 const List<GiftItem> kGiftCatalog = [
-  GiftItem(id: 'rose', name: 'গোলাপ (Rose)', emoji: '🌹', price: 10, expReward: 20),
-  GiftItem(id: 'heart', name: 'লাভ (Heart)', emoji: '💖', price: 50, expReward: 100),
-  GiftItem(id: 'crown', name: 'মুকুট (Crown)', emoji: '👑', price: 200, expReward: 450),
-  GiftItem(id: 'car', name: 'স্পোর্টস কার', emoji: '🏎️', price: 1000, expReward: 2500),
+  GiftItem(id: 'banana', name: 'গোল্ডেন ব্যানানা', emoji: '🍌', price: 10, expReward: 25),
+  GiftItem(id: 'rose', name: 'গোলাপ (Rose)', emoji: '🌹', price: 20, expReward: 50),
+  GiftItem(id: 'heart', name: 'লাভ (Heart)', emoji: '💖', price: 50, expReward: 120),
+  GiftItem(id: 'crown', name: 'রাজমুকুট (Crown)', emoji: '👑', price: 200, expReward: 500),
+  GiftItem(id: 'car', name: 'সুপার কার', emoji: '🏎️', price: 1000, expReward: 2500),
 ];
 
 int calculateLevel(int exp) {
@@ -67,7 +68,7 @@ int calculateLevel(int exp) {
 }
 
 // ==================================================
-// ২. লবি ও ইউজার প্রোফাইল স্ক্রিন
+// ২. ব্যানানা ভয়েস লবি ও প্রোফাইল স্ক্রিন
 // ==================================================
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});
@@ -79,10 +80,10 @@ class LobbyScreen extends StatefulWidget {
 class _LobbyScreenState extends State<LobbyScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _roomController =
-      TextEditingController(text: 'tibbot_room_1');
+      TextEditingController(text: 'banana_room_1');
 
   String _userId = '';
-  String _userName = 'User';
+  String _userName = 'BananaUser';
   int _coins = 5000; // নতুন ইউজারের জন্য ফ্রি ডেমো কয়েন
   int _exp = 0;
 
@@ -94,27 +95,27 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   Future<void> _loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
-    String? savedId = prefs.getString('user_id');
+    String? savedId = prefs.getString('bv_user_id');
     if (savedId == null) {
       savedId = (100000 + Random().nextInt(899999)).toString();
-      await prefs.setString('user_id', savedId);
+      await prefs.setString('bv_user_id', savedId);
     }
 
     if (!mounted) return;
     setState(() {
       _userId = savedId!;
-      _userName = prefs.getString('user_name') ?? 'Tibbot_$savedId';
-      _coins = prefs.getInt('user_coins') ?? 5000;
-      _exp = prefs.getInt('user_exp') ?? 650;
+      _userName = prefs.getString('bv_user_name') ?? 'Banana_$savedId';
+      _coins = prefs.getInt('bv_user_coins') ?? 5000;
+      _exp = prefs.getInt('bv_user_exp') ?? 650;
       _nameController.text = _userName;
     });
   }
 
-  Future<void> _saveNameAndCoins({String? newName, int? coins, int? exp}) async {
+  Future<void> _saveUserProfile({String? newName, int? coins, int? exp}) async {
     final prefs = await SharedPreferences.getInstance();
-    if (newName != null) await prefs.setString('user_name', newName);
-    if (coins != null) await prefs.setInt('user_coins', coins);
-    if (exp != null) await prefs.setInt('user_exp', exp);
+    if (newName != null) await prefs.setString('bv_user_name', newName);
+    if (coins != null) await prefs.setInt('bv_user_coins', coins);
+    if (exp != null) await prefs.setInt('bv_user_exp', exp);
     if (!mounted) return;
     setState(() {
       if (newName != null) _userName = newName;
@@ -130,12 +131,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
         : _nameController.text.trim();
     if (roomId.isEmpty) return;
 
-    _saveNameAndCoins(newName: name);
+    _saveUserProfile(newName: name);
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => AudioLiveRoomPage(
+        builder: (_) => BananaAudioLiveRoomPage(
           roomID: roomId,
           userID: _userId,
           userName: name,
@@ -143,11 +144,18 @@ class _LobbyScreenState extends State<LobbyScreen> {
           initialCoins: _coins,
           initialExp: _exp,
           onWalletUpdated: (newCoins, newExp) {
-            _saveNameAndCoins(coins: newCoins, exp: newExp);
+            _saveUserProfile(coins: newCoins, exp: newExp);
           },
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _roomController.dispose();
+    super.dispose();
   }
 
   @override
@@ -156,7 +164,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('তিব্বত দি অডিও লাইভ টিভি'),
+        title: const Text(
+          '🍌 ব্যানানা ভয়েস (Banana Voice)',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -164,14 +175,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ইউজার আইডি ও লেভেল কার্ড
+            // ইউজার আইডি ও লেভেল প্রোফাইল কার্ড
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF4A148C), Color(0xFF880E4F)],
+                  colors: [Color(0xFF3E1E68), Color(0xFF7B1FA2)],
                 ),
                 borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: Colors.amber.withAlpha(110)),
               ),
               child: Row(
                 children: [
@@ -179,7 +191,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                     radius: 30,
                     backgroundColor: Colors.amber,
                     child: Text(
-                      _userName.isNotEmpty ? _userName[0].toUpperCase() : 'U',
+                      _userName.isNotEmpty ? _userName[0].toUpperCase() : 'B',
                       style: const TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
@@ -227,7 +239,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                         Text('ID: $_userId  •  EXP: $_exp',
                             style: const TextStyle(color: Colors.white70)),
                         const SizedBox(height: 4),
-                        Text('💰 ব্যালেন্স: $_coins Coins',
+                        Text('🪙 ব্যালেন্স: $_coins Coins',
                             style: const TextStyle(
                               color: Colors.amberAccent,
                               fontWeight: FontWeight.w600,
@@ -243,7 +255,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: 'আপনার নাম',
+                labelText: 'আপনার নাম লিখুন',
                 prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
               ),
@@ -253,7 +265,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
             TextField(
               controller: _roomController,
               decoration: const InputDecoration(
-                labelText: 'লাইভ রুম আইডি (যেমন: tibbot_room_1)',
+                labelText: 'ভয়েস রুম আইডি (যেমন: banana_room_1)',
                 prefixIcon: Icon(Icons.meeting_room),
                 border: OutlineInputBorder(),
               ),
@@ -262,9 +274,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                backgroundColor: Colors.pinkAccent,
-                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                backgroundColor: Colors.amber,
+                foregroundColor: Colors.black,
               ),
               icon: const Icon(Icons.mic),
               label: const Text(
@@ -277,12 +289,13 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                side: const BorderSide(color: Colors.amber),
               ),
-              icon: const Icon(Icons.headphones),
+              icon: const Icon(Icons.headphones, color: Colors.amber),
               label: const Text(
                 'আড্ডায় যোগ দিন (Audience / Speaker)',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16, color: Colors.amber),
               ),
               onPressed: () => _joinRoom(isHost: false),
             ),
@@ -294,9 +307,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
 }
 
 // ==================================================
-// ৩. ২০-সিটের লাইভ অডিও রুম (গিফট + প্রোফাইল + লেভেল)
+// ৩. ২০-সিটের ব্যানানা ভয়েস লাইভ রুম (গিফট + আইডি + লেভেল)
 // ==================================================
-class AudioLiveRoomPage extends StatefulWidget {
+class BananaAudioLiveRoomPage extends StatefulWidget {
   final String roomID;
   final String userID;
   final String userName;
@@ -305,7 +318,7 @@ class AudioLiveRoomPage extends StatefulWidget {
   final int initialExp;
   final Function(int coins, int exp) onWalletUpdated;
 
-  const AudioLiveRoomPage({
+  const BananaAudioLiveRoomPage({
     super.key,
     required this.roomID,
     required this.userID,
@@ -317,15 +330,15 @@ class AudioLiveRoomPage extends StatefulWidget {
   });
 
   @override
-  State<AudioLiveRoomPage> createState() => _AudioLiveRoomPageState();
+  State<BananaAudioLiveRoomPage> createState() =>
+      _BananaAudioLiveRoomPageState();
 }
 
-class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
+class _BananaAudioLiveRoomPageState extends State<BananaAudioLiveRoomPage> {
   late int _coins;
   late int _exp;
   StreamSubscription<ZegoInRoomCommandReceivedData>? _cmdSub;
 
-  // গিফট অ্যানিমেশন ব্যানার স্টেট
   String? _giftBannerText;
   Timer? _bannerTimer;
 
@@ -335,7 +348,6 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
     _coins = widget.initialCoins;
     _exp = widget.initialExp;
 
-    // রুমের সবার পাঠানো গিফট রিয়েল-টাইমে রিসিভ করার লিসেনার
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _cmdSub = ZegoUIKit()
           .getInRoomCommandReceivedStream()
@@ -354,7 +366,6 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
         final giftName = decoded['giftName'] ?? 'Gift';
         final expReward = (decoded['exp'] as num?)?.toInt() ?? 0;
 
-        // যদি গিফটটি আমি পেয়ে থাকি, আমার EXP বাড়বে
         if (receiverId == widget.userID) {
           setState(() => _exp += expReward);
           widget.onWalletUpdated(_coins, _exp);
@@ -399,14 +410,12 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
       'exp': gift.expReward,
     });
 
-    // রুমের সবাইকে গিফট সিগন্যাল পাঠানো
     await ZegoUIKit().sendInRoomCommand(payload, []);
     _showGiftBanner(
       '${gift.emoji} আপনি ${receiver.name}-কে "${gift.name}" পাঠিয়েছেন!',
     );
   }
 
-  // অন্য ইউজারের আইডি, লেভেল ও প্রোফাইল কার্ড দেখানো
   void _showUserProfileDialog(ZegoUIKitUser user) {
     final attrs = user.inRoomAttributes.value;
     final userLevel = attrs['level'] ?? '1';
@@ -421,10 +430,13 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundColor: Colors.pinkAccent,
+              backgroundColor: Colors.amber,
               child: Text(
-                user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
-                style: const TextStyle(color: Colors.white),
+                user.name.isNotEmpty ? user.name[0].toUpperCase() : 'B',
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -463,7 +475,7 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
           children: [
             Text('⭐ মোট EXP: $userExp'),
             const SizedBox(height: 6),
-            Text('🎙️ রুম আইডি: ${widget.roomID}'),
+            Text('🍌 ব্যানানা ভয়েস রুম: ${widget.roomID}'),
           ],
         ),
         actions: [
@@ -473,6 +485,10 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
           ),
           if (user.id != widget.userID)
             ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+                foregroundColor: Colors.black,
+              ),
               icon: const Icon(Icons.card_giftcard),
               label: const Text('গিফট পাঠান'),
               onPressed: () {
@@ -485,11 +501,10 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
     );
   }
 
-  // গিফট শপ বটম শিট
   void _openGiftSheet({ZegoUIKitUser? preselectedUser}) {
     final users = ZegoUIKit().getAllUsers();
-    ZegoUIKitUser? selectedUser = preselectedUser ??
-        (users.isNotEmpty ? users.first : null);
+    ZegoUIKitUser? selectedUser =
+        preselectedUser ?? (users.isNotEmpty ? users.first : null);
 
     showModalBottomSheet(
       context: context,
@@ -508,12 +523,12 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      '🎁 গিফট পাঠান',
+                      '🎁 ব্যানানা ভয়েস গিফট শপ',
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      '💰 $_coins Coins',
+                      '🪙 $_coins Coins',
                       style: const TextStyle(
                         color: Colors.amberAccent,
                         fontWeight: FontWeight.bold,
@@ -523,7 +538,6 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
                 ),
                 const SizedBox(height: 12),
 
-                // কাকে গিফট পাঠাবেন তা সিলেক্ট করা
                 if (users.isNotEmpty)
                   DropdownButtonFormField<ZegoUIKitUser>(
                     value: selectedUser,
@@ -545,10 +559,10 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
                   shrinkWrap: true,
                   itemCount: kGiftCatalog.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
+                    crossAxisCount: 3,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
-                    childAspectRatio: 0.78,
+                    childAspectRatio: 1.05,
                   ),
                   itemBuilder: (_, index) {
                     final gift = kGiftCatalog[index];
@@ -563,15 +577,15 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
                         decoration: BoxDecoration(
                           color: Colors.white10,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.purpleAccent.withAlpha(80)),
+                          border: Border.all(color: Colors.amber.withAlpha(90)),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(gift.emoji, style: const TextStyle(fontSize: 28)),
+                            Text(gift.emoji, style: const TextStyle(fontSize: 26)),
                             const SizedBox(height: 4),
                             Text(
-                              gift.name.split(' ').first,
+                              gift.name,
                               style: const TextStyle(fontSize: 11),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -610,14 +624,14 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
         ? ZegoUIKitPrebuiltLiveAudioRoomConfig.host()
         : ZegoUIKitPrebuiltLiveAudioRoomConfig.audience();
 
-    // ১. ইউজারের লেভেল ও আইডি অ্যাট্রিবিউট সেট করা (সর্বোচ্চ ১০০ বাইটের মধ্যে)
+    // ইউজারের লেভেল ও আইডি ইন-রুম অ্যাট্রিবিউট হিসেবে সেট
     config.userInRoomAttributes = {
       'level': '$myLevel',
       'exp': '$_exp',
       'id_no': widget.userID,
     };
 
-    // ২. ২০টি সিটের লেআউট (৪ সারি × ৫টি করে = ২০ সিট)
+    // ২০টি অডিও সিট (৪ সারি × ৫টি করে = ২০ সিট)
     config.seat.hostIndexes = const [0];
     config.seat.layout = ZegoLiveAudioRoomLayoutConfig(
       rowSpacing: 10,
@@ -630,7 +644,7 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
       ),
     );
 
-    // ৩. প্রতিটি সিটের ওপর ইউজারের Level Badge ও প্রোফাইল ক্লিক যোগ করা
+    // প্রতিটি সিটের ওপর লেভেল ব্যাজ ও প্রোফাইল ভিউ
     config.seat.keepOriginalForeground = true;
     config.seat.foregroundBuilder = (context, size, user, extraInfo) {
       if (user == null) return const SizedBox.shrink();
@@ -658,12 +672,16 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
       );
     };
 
-    // ৪. মেম্বার লিস্টে ট্যাপ করেও একজনের আইডি ও লেভেল আরেকজন দেখতে পারবে
+    // মেম্বার লিস্ট থেকেও আইডি ও লেভেল দেখা যাবে
     config.memberList.itemBuilder = (context, size, user, extraInfo) {
       final lvl = user.inRoomAttributes.value['level'] ?? '1';
       return ListTile(
         leading: CircleAvatar(
-          child: Text(user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U'),
+          backgroundColor: Colors.amber,
+          child: Text(
+            user.name.isNotEmpty ? user.name[0].toUpperCase() : 'B',
+            style: const TextStyle(color: Colors.black),
+          ),
         ),
         title: Text(user.name),
         subtitle: Text('ID: ${user.id} • Lv.$lvl'),
@@ -672,21 +690,21 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
       );
     };
 
-    // ৫. নিচের মেনু বারে সবার জন্য Gift বাটন যুক্ত করা
+    // নিচের মেনু বারে গিফট বাটন
     final giftBtn = IconButton(
-      style: IconButton.styleFrom(backgroundColor: Colors.pinkAccent),
-      icon: const Icon(Icons.card_giftcard, color: Colors.white),
+      style: IconButton.styleFrom(backgroundColor: Colors.amber),
+      icon: const Icon(Icons.card_giftcard, color: Colors.black),
       onPressed: () => _openGiftSheet(),
     );
     config.bottomMenuBar.hostExtendButtons = [giftBtn];
     config.bottomMenuBar.speakerExtendButtons = [giftBtn];
     config.bottomMenuBar.audienceExtendButtons = [giftBtn];
 
-    // ৬. রুমের বিলাসবহুল ব্যাকগ্রাউন্ড ও গিফট অ্যানিমেশন ওভারলে
+    // রুমের ব্যাকগ্রাউন্ড ও গিফট অ্যানিমেশন ব্যানার
     config.background = Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF140B2D), Color(0xFF2B124C), Color(0xFF0F0A1E)],
+          colors: [Color(0xFF1A0E33), Color(0xFF2D1657), Color(0xFF120B24)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -706,7 +724,7 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Colors.pinkAccent, Colors.deepPurpleAccent],
+                    colors: [Colors.amber, Colors.deepOrangeAccent],
                   ),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: const [
@@ -717,7 +735,7 @@ class _AudioLiveRoomPageState extends State<AudioLiveRoomPage> {
                   _giftBannerText!,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
