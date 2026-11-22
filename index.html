@@ -1340,42 +1340,4 @@
   </div>
 </div>
 
-<script>
-let cuteExp = Number(localStorage.getItem("cuteExp")) || 0;
 
-function updateLevel() {
-  let level = Math.floor(cuteExp / 100) + 1;
-  let current = cuteExp % 100;
-
-  document.getElementById("userLevel").innerText = level;
-  document.getElementById("userExp").innerText = cuteExp;
-
-  document.getElementById("levelProgress").style.width =
-    current + "%";
-
-  document.getElementById("nextExp").innerText =
-    (100-current) + " EXP needed for next level";
-
-  document.getElementById("levelDescription").innerText =
-    "You are currently at Level " + level;
-
-  document.getElementById("levelRequirement").innerText =
-    "Total EXP: " + cuteExp;
-  
-  localStorage.setItem("cuteExp", cuteExp);
-}
-
-function showLevelDetails() {
-  let box = document.getElementById("levelDetails");
-  box.style.display =
-    box.style.display === "block" ? "none" : "block";
-  updateLevel();
-}
-
-function addCuteExp(amount) {
-  cuteExp += amount;
-  updateLevel();
-}
-
-updateLevel();
-</script>
