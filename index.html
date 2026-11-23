@@ -1,758 +1,115 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zego_uikit/zego_uikit.dart';
-import 'package:zego_uikit_prebuilt_live_audio_room/zego_uikit_prebuilt_live_audio_room.dart';
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>আদর লাইভ - ৫টি ডেমো স্ক্রিন</title>
+<style>
+  body { background:#0b0618; color:#fff; font-family:sans-serif; margin:0; padding:20px; display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+  .phone { width:260px; height:490px; background:linear-gradient(180deg,#251047,#120724); border:4px solid #442878; border-radius:28px; padding:14px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 10px 30px rgba(233,30,99,0.25); }
+  .tag { text-align:center; font-size:12px; color:#ff80ab; font-weight:bold; margin-bottom:6px; }
+  .btn { background:linear-gradient(90deg,#e91e63,#9c27b0); padding:10px; border-radius:12px; text-align:center; font-weight:bold; font-size:13px; margin:6px 0; }
+  .btn-out { border:1px solid #ff4081; padding:9px; border-radius:12px; text-align:center; font-size:13px; margin:6px 0; }
+  .card { background:rgba(255,255,255,0.08); border-radius:12px; padding:10px; font-size:12px; margin-bottom:8px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .seats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; text-align:center; font-size:11px; margin:10px 0; }
+  .avatar { width:46px; height:46px; border-radius:50%; background:#4a237a; margin:0 auto 4px; display:flex; align-items:center; justify-content:center; font-size:20px; border:2px solid #ff4081; }
+  .empty { border:2px dashed #7c58b5; background:rgba(255,255,255,0.04); }
+  .chat { background:rgba(0,0,0,0.35); border-radius:10px; padding:8px; font-size:11px; line-height:1.6; }
+  .gift-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center; }
+  .gift-box { background:rgba(255,255,255,0.08); padding:8px 4px; border-radius:10px; font-size:11px; }
+</style>
+</head>
+<body>
 
-// ⚠️ এখানে আপনার ZEGOCLOUD Console থেকে পাওয়া AppID ও AppSign বসান
-class ZegoConfig {
-  static const int appID = 123456789; // আপনার AppID (সংখ্যা)
-  static const String appSign = 'YOUR_APP_SIGN_HERE'; // আপনার AppSign
-}
+<div class="phone">
+  <div class="tag">১. লগইন স্ক্রিন</div>
+  <div style="text-align:center;margin-top:30px;">
+    <div style="font-size:48px;">🎙️</div>
+    <h2 style="margin:6px 0;color:#ff80ab;">আদর লাইভ</h2>
+    <p style="font-size:12px;color:#ccc;">বন্ধুদের সাথে গ্রুপ ভয়েস আড্ডা</p>
+  </div>
+  <div>
+    <div class="btn">📱 মোবাইল নম্বর দিয়ে লগইন</div>
+    <div class="btn-out">🔵 Google দিয়ে ঢুকুন</div>
+    <p style="text-align:center;font-size:11px;color:#aaa;">গেস্ট হিসেবে ঢুকুন</p>
+  </div>
+</div>
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const BananaVoiceApp());
-}
+<div class="phone">
+  <div class="tag">২. হোম ও রুম লিস্ট</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:bold;">
+    <span>🎙️ আদর লাইভ</span><span>🪙 500</span>
+  </div>
+  <div class="card" style="background:linear-gradient(90deg,#880e4f,#4a148c);">
+    🔥 রাতের আড্ডা ঘর <br><small>👑 রিমন • 👥 ৩৪ জন লাইভে</small>
+  </div>
+  <div class="grid">
+    <div class="card">🎵 গানের আসর<br><small>👥 ১৮ জন</small></div>
+    <div class="card">❤️ ভালোবাসা<br><small>👥 ১২ জন</small></div>
+    <div class="card">☕ কফি শপ<br><small>👥 ৯ জন</small></div>
+    <div class="card">🎤 কবিতা<br><small>👥 ১৫ জন</small></div>
+  </div>
+  <div class="btn">+ নতুন ভয়েস রুম খুলুন</div>
+</div>
 
-class BananaVoiceApp extends StatelessWidget {
-  const BananaVoiceApp({super.key});
+<div class="phone">
+  <div class="tag">৩. ভয়েস গ্রুপ চ্যাট রুম</div>
+  <div style="display:flex;justify-content:space-between;font-size:12px;">
+    <span>🎵 গানের আসর</span><span>👥 ১৮ ❌</span>
+  </div>
+  <div style="text-align:center;">
+    <div class="avatar" style="border-color:gold;">👩</div>
+    <small>👑 মিম (হোস্ট)</small>
+  </div>
+  <div class="seats">
+    <div><div class="avatar">🧑</div>জয় 🎙️</div>
+    <div><div class="avatar">👩</div>তানহা 🔇</div>
+    <div><div class="avatar empty">🪑</div>খালি</div>
+    <div><div class="avatar">🧑</div>রিমন</div>
+    <div><div class="avatar empty">🔒</div>লকড</div>
+    <div><div class="avatar empty">🪑</div>খালি</div>
+  </div>
+  <div class="chat">
+    💬 জয়: দারুণ গান হচ্ছে আপু!<br>
+    🎁 সাকিব -> মিমকে 🌹 দিয়েছে!
+  </div>
+  <div style="display:flex;justify-content:space-around;font-size:18px;">
+    <span>💬</span><span>✋</span><span>🎙️</span><span>🎁</span>
+  </div>
+</div>
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ব্যানানা ভয়েস (Banana Voice)',
-      theme: ThemeData.dark(useMaterial3: true).copyWith(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.amber,
-          brightness: Brightness.dark,
-        ),
-      ),
-      home: const LobbyScreen(),
-    );
-  }
-}
+<div class="phone">
+  <div class="tag">৪. গিফট ও ওয়ালেট</div>
+  <div style="display:flex;justify-content:space-between;font-size:13px;">
+    <span>🎁 গিফট পাঠান</span><span>🪙 500</span>
+  </div>
+  <div class="card">প্রাপক: <b>👩 মিম (হোস্ট)</b></div>
+  <div class="gift-grid">
+    <div class="gift-box">🌹<br>গোলাপ<br>🪙 10</div>
+    <div class="gift-box">❤️<br>হার্ট<br>🪙 50</div>
+    <div class="gift-box">💎<br>হীরা<br>🪙 200</div>
+    <div class="gift-box">🎂<br>কেক<br>🪙 80</div>
+    <div class="gift-box">👑<br>মুকুট<br>🪙 300</div>
+    <div class="gift-box">🏎️<br>গাড়ি<br>🪙 1000</div>
+  </div>
+  <div class="btn">গিফট পাঠান (Send)</div>
+</div>
 
-// ==================================================
-// ১. গিফট মডেল ও লেভেল সিস্টেম
-// ==================================================
-class GiftItem {
-  final String id;
-  final String name;
-  final String emoji;
-  final int price;
-  final int expReward;
+<div class="phone">
+  <div class="tag">৫. প্রোফাইল ও লেভেল</div>
+  <div style="text-align:center;">
+    <div class="avatar" style="width:65px;height:65px;font-size:28px;">😊</div>
+    <b>রিমন আহমেদ</b> <small style="color:#ff80ab;">Lv.12</small><br>
+    <small style="color:#aaa;">ID: 102458</small>
+  </div>
+  <div class="grid" style="text-align:center;">
+    <div class="card">🪙 কয়েন<br><b>500</b></div>
+    <div class="card">💎 ডায়মন্ড<br><b>1,250</b></div>
+  </div>
+  <div class="card">🏠 আমার নিজের রুম<br><br>🏅 VIP ফ্রেম ও ব্যাজ<br><br>⚙️ সেটিংস ও হেল্প</div>
+  <div class="btn-out">লগআউট</div>
+</div>
 
-  const GiftItem({
-    required this.id,
-    required this.name,
-    required this.emoji,
-    required this.price,
-    required this.expReward,
-  });
-}
-
-const List<GiftItem> kGiftCatalog = [
-  GiftItem(id: 'banana', name: 'গোল্ডেন ব্যানানা', emoji: '🍌', price: 10, expReward: 25),
-  GiftItem(id: 'rose', name: 'গোলাপ (Rose)', emoji: '🌹', price: 20, expReward: 50),
-  GiftItem(id: 'heart', name: 'লাভ (Heart)', emoji: '💖', price: 50, expReward: 120),
-  GiftItem(id: 'crown', name: 'রাজমুকুট (Crown)', emoji: '👑', price: 200, expReward: 500),
-  GiftItem(id: 'car', name: 'সুপার কার', emoji: '🏎️', price: 1000, expReward: 2500),
-];
-
-int calculateLevel(int exp) {
-  return (exp ~/ 500) + 1; // প্রতি ৫০০ EXP তে ১ লেভেল বাড়বে
-}
-
-// ==================================================
-// ২. ব্যানানা ভয়েস লবি ও প্রোফাইল স্ক্রিন
-// ==================================================
-class LobbyScreen extends StatefulWidget {
-  const LobbyScreen({super.key});
-
-  @override
-  State<LobbyScreen> createState() => _LobbyScreenState();
-}
-
-class _LobbyScreenState extends State<LobbyScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _roomController =
-      TextEditingController(text: 'banana_room_1');
-
-  String _userId = '';
-  String _userName = 'BananaUser';
-  int _coins = 5000; // নতুন ইউজারের জন্য ফ্রি ডেমো কয়েন
-  int _exp = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserProfile();
-  }
-
-  Future<void> _loadUserProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? savedId = prefs.getString('bv_user_id');
-    if (savedId == null) {
-      savedId = (100000 + Random().nextInt(899999)).toString();
-      await prefs.setString('bv_user_id', savedId);
-    }
-
-    if (!mounted) return;
-    setState(() {
-      _userId = savedId!;
-      _userName = prefs.getString('bv_user_name') ?? 'Banana_$savedId';
-      _coins = prefs.getInt('bv_user_coins') ?? 5000;
-      _exp = prefs.getInt('bv_user_exp') ?? 650;
-      _nameController.text = _userName;
-    });
-  }
-
-  Future<void> _saveUserProfile({String? newName, int? coins, int? exp}) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (newName != null) await prefs.setString('bv_user_name', newName);
-    if (coins != null) await prefs.setInt('bv_user_coins', coins);
-    if (exp != null) await prefs.setInt('bv_user_exp', exp);
-    if (!mounted) return;
-    setState(() {
-      if (newName != null) _userName = newName;
-      if (coins != null) _coins = coins;
-      if (exp != null) _exp = exp;
-    });
-  }
-
-  void _joinRoom({required bool isHost}) {
-    final roomId = _roomController.text.trim();
-    final name = _nameController.text.trim().isEmpty
-        ? _userName
-        : _nameController.text.trim();
-    if (roomId.isEmpty) return;
-
-    _saveUserProfile(newName: name);
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BananaAudioLiveRoomPage(
-          roomID: roomId,
-          userID: _userId,
-          userName: name,
-          isHost: isHost,
-          initialCoins: _coins,
-          initialExp: _exp,
-          onWalletUpdated: (newCoins, newExp) {
-            _saveUserProfile(coins: newCoins, exp: newExp);
-          },
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _roomController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final level = calculateLevel(_exp);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          '🍌 ব্যানানা ভয়েস (Banana Voice)',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // ইউজার আইডি ও লেভেল প্রোফাইল কার্ড
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF3E1E68), Color(0xFF7B1FA2)],
-                ),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: Colors.amber.withAlpha(110)),
-              ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.amber,
-                    child: Text(
-                      _userName.isNotEmpty ? _userName[0].toUpperCase() : 'B',
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                _userName,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.amber,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                'Lv.$level',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text('ID: $_userId  •  EXP: $_exp',
-                            style: const TextStyle(color: Colors.white70)),
-                        const SizedBox(height: 4),
-                        Text('🪙 ব্যালেন্স: $_coins Coins',
-                            style: const TextStyle(
-                              color: Colors.amberAccent,
-                              fontWeight: FontWeight.w600,
-                            )),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'আপনার নাম লিখুন',
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 14),
-
-            TextField(
-              controller: _roomController,
-              decoration: const InputDecoration(
-                labelText: 'ভয়েস রুম আইডি (যেমন: banana_room_1)',
-                prefixIcon: Icon(Icons.meeting_room),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 22),
-
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                backgroundColor: Colors.amber,
-                foregroundColor: Colors.black,
-              ),
-              icon: const Icon(Icons.mic),
-              label: const Text(
-                'নতুন লাইভ রুম চালু করুন (Host)',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              onPressed: () => _joinRoom(isHost: true),
-            ),
-            const SizedBox(height: 12),
-
-            OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                side: const BorderSide(color: Colors.amber),
-              ),
-              icon: const Icon(Icons.headphones, color: Colors.amber),
-              label: const Text(
-                'আড্ডায় যোগ দিন (Audience / Speaker)',
-                style: TextStyle(fontSize: 16, color: Colors.amber),
-              ),
-              onPressed: () => _joinRoom(isHost: false),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ==================================================
-// ৩. ২০-সিটের ব্যানানা ভয়েস লাইভ রুম (গিফট + আইডি + লেভেল)
-// ==================================================
-class BananaAudioLiveRoomPage extends StatefulWidget {
-  final String roomID;
-  final String userID;
-  final String userName;
-  final bool isHost;
-  final int initialCoins;
-  final int initialExp;
-  final Function(int coins, int exp) onWalletUpdated;
-
-  const BananaAudioLiveRoomPage({
-    super.key,
-    required this.roomID,
-    required this.userID,
-    required this.userName,
-    required this.isHost,
-    required this.initialCoins,
-    required this.initialExp,
-    required this.onWalletUpdated,
-  });
-
-  @override
-  State<BananaAudioLiveRoomPage> createState() =>
-      _BananaAudioLiveRoomPageState();
-}
-
-class _BananaAudioLiveRoomPageState extends State<BananaAudioLiveRoomPage> {
-  late int _coins;
-  late int _exp;
-  StreamSubscription<ZegoInRoomCommandReceivedData>? _cmdSub;
-
-  String? _giftBannerText;
-  Timer? _bannerTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _coins = widget.initialCoins;
-    _exp = widget.initialExp;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _cmdSub = ZegoUIKit()
-          .getInRoomCommandReceivedStream()
-          .listen(_onInRoomCommandReceived);
-    });
-  }
-
-  void _onInRoomCommandReceived(ZegoInRoomCommandReceivedData data) {
-    try {
-      final decoded = jsonDecode(data.command);
-      if (decoded is Map && decoded['type'] == 'gift') {
-        final senderName = decoded['senderName'] ?? 'Someone';
-        final receiverName = decoded['receiverName'] ?? 'Host';
-        final receiverId = decoded['receiverId'] ?? '';
-        final emoji = decoded['emoji'] ?? '🎁';
-        final giftName = decoded['giftName'] ?? 'Gift';
-        final expReward = (decoded['exp'] as num?)?.toInt() ?? 0;
-
-        if (receiverId == widget.userID) {
-          setState(() => _exp += expReward);
-          widget.onWalletUpdated(_coins, _exp);
-        }
-
-        _showGiftBanner('$emoji $senderName → $receiverName কে "$giftName" পাঠিয়েছে!');
-      }
-    } catch (_) {}
-  }
-
-  void _showGiftBanner(String message) {
-    _bannerTimer?.cancel();
-    if (!mounted) return;
-    setState(() => _giftBannerText = message);
-    _bannerTimer = Timer(const Duration(seconds: 4), () {
-      if (mounted) setState(() => _giftBannerText = null);
-    });
-  }
-
-  Future<void> _sendGiftToUser(ZegoUIKitUser receiver, GiftItem gift) async {
-    if (_coins < gift.price) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('আপনার পর্যাপ্ত কয়েন নেই!')),
-      );
-      return;
-    }
-
-    setState(() {
-      _coins -= gift.price;
-      _exp += gift.expReward;
-    });
-    widget.onWalletUpdated(_coins, _exp);
-
-    final payload = jsonEncode({
-      'type': 'gift',
-      'senderId': widget.userID,
-      'senderName': widget.userName,
-      'receiverId': receiver.id,
-      'receiverName': receiver.name,
-      'giftName': gift.name,
-      'emoji': gift.emoji,
-      'exp': gift.expReward,
-    });
-
-    await ZegoUIKit().sendInRoomCommand(payload, []);
-    _showGiftBanner(
-      '${gift.emoji} আপনি ${receiver.name}-কে "${gift.name}" পাঠিয়েছেন!',
-    );
-  }
-
-  void _showUserProfileDialog(ZegoUIKitUser user) {
-    final attrs = user.inRoomAttributes.value;
-    final userLevel = attrs['level'] ?? '1';
-    final userExp = attrs['exp'] ?? '0';
-    final customId = attrs['id_no'] ?? user.id;
-
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1F1638),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: Colors.amber,
-              child: Text(
-                user.name.isNotEmpty ? user.name[0].toUpperCase() : 'B',
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(user.name, style: const TextStyle(fontSize: 17)),
-                  Text(
-                    'ID: $customId',
-                    style: const TextStyle(fontSize: 12, color: Colors.white60),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.amber,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'Lv.$userLevel',
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('⭐ মোট EXP: $userExp'),
-            const SizedBox(height: 6),
-            Text('🍌 ব্যানানা ভয়েস রুম: ${widget.roomID}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('বন্ধ করুন'),
-          ),
-          if (user.id != widget.userID)
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                foregroundColor: Colors.black,
-              ),
-              icon: const Icon(Icons.card_giftcard),
-              label: const Text('গিফট পাঠান'),
-              onPressed: () {
-                Navigator.pop(context);
-                _openGiftSheet(preselectedUser: user);
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  void _openGiftSheet({ZegoUIKitUser? preselectedUser}) {
-    final users = ZegoUIKit().getAllUsers();
-    ZegoUIKitUser? selectedUser =
-        preselectedUser ?? (users.isNotEmpty ? users.first : null);
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1A1230),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
-      builder: (_) => StatefulBuilder(
-        builder: (context, setSheetState) {
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      '🎁 ব্যানানা ভয়েস গিফট শপ',
-                      style:
-                          TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      '🪙 $_coins Coins',
-                      style: const TextStyle(
-                        color: Colors.amberAccent,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                if (users.isNotEmpty)
-                  DropdownButtonFormField<ZegoUIKitUser>(
-                    value: selectedUser,
-                    decoration: const InputDecoration(
-                      labelText: 'যাকে গিফট পাঠাবেন',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: users
-                        .map((u) => DropdownMenuItem(
-                              value: u,
-                              child: Text('${u.name} (ID: ${u.id})'),
-                            ))
-                        .toList(),
-                    onChanged: (val) => setSheetState(() => selectedUser = val),
-                  ),
-                const SizedBox(height: 16),
-
-                GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: kGiftCatalog.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: 1.05,
-                  ),
-                  itemBuilder: (_, index) {
-                    final gift = kGiftCatalog[index];
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () {
-                        if (selectedUser == null) return;
-                        Navigator.pop(context);
-                        _sendGiftToUser(selectedUser!, gift);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white10,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.amber.withAlpha(90)),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(gift.emoji, style: const TextStyle(fontSize: 26)),
-                            const SizedBox(height: 4),
-                            Text(
-                              gift.name,
-                              style: const TextStyle(fontSize: 11),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              '🪙 ${gift.price}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.amberAccent,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _cmdSub?.cancel();
-    _bannerTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final myLevel = calculateLevel(_exp);
-    final config = widget.isHost
-        ? ZegoUIKitPrebuiltLiveAudioRoomConfig.host()
-        : ZegoUIKitPrebuiltLiveAudioRoomConfig.audience();
-
-    // ইউজারের লেভেল ও আইডি ইন-রুম অ্যাট্রিবিউট হিসেবে সেট
-    config.userInRoomAttributes = {
-      'level': '$myLevel',
-      'exp': '$_exp',
-      'id_no': widget.userID,
-    };
-
-    // ২০টি অডিও সিট (৪ সারি × ৫টি করে = ২০ সিট)
-    config.seat.hostIndexes = const [0];
-    config.seat.layout = ZegoLiveAudioRoomLayoutConfig(
-      rowSpacing: 10,
-      rowConfigs: List.generate(
-        4,
-        (_) => ZegoLiveAudioRoomLayoutRowConfig(
-          count: 5,
-          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
-        ),
-      ),
-    );
-
-    // প্রতিটি সিটের ওপর লেভেল ব্যাজ ও প্রোফাইল ভিউ
-    config.seat.keepOriginalForeground = true;
-    config.seat.foregroundBuilder = (context, size, user, extraInfo) {
-      if (user == null) return const SizedBox.shrink();
-      final lvl = user.inRoomAttributes.value['level'] ?? '1';
-      return Align(
-        alignment: Alignment.topRight,
-        child: GestureDetector(
-          onTap: () => _showUserProfileDialog(user),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.amber,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              'Lv.$lvl',
-              style: const TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ),
-      );
-    };
-
-    // মেম্বার লিস্ট থেকেও আইডি ও লেভেল দেখা যাবে
-    config.memberList.itemBuilder = (context, size, user, extraInfo) {
-      final lvl = user.inRoomAttributes.value['level'] ?? '1';
-      return ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.amber,
-          child: Text(
-            user.name.isNotEmpty ? user.name[0].toUpperCase() : 'B',
-            style: const TextStyle(color: Colors.black),
-          ),
-        ),
-        title: Text(user.name),
-        subtitle: Text('ID: ${user.id} • Lv.$lvl'),
-        trailing: const Icon(Icons.info_outline, color: Colors.amber),
-        onTap: () => _showUserProfileDialog(user),
-      );
-    };
-
-    // নিচের মেনু বারে গিফট বাটন
-    final giftBtn = IconButton(
-      style: IconButton.styleFrom(backgroundColor: Colors.amber),
-      icon: const Icon(Icons.card_giftcard, color: Colors.black),
-      onPressed: () => _openGiftSheet(),
-    );
-    config.bottomMenuBar.hostExtendButtons = [giftBtn];
-    config.bottomMenuBar.speakerExtendButtons = [giftBtn];
-    config.bottomMenuBar.audienceExtendButtons = [giftBtn];
-
-    // রুমের ব্যাকগ্রাউন্ড ও গিফট অ্যানিমেশন ব্যানার
-    config.background = Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF1A0E33), Color(0xFF2D1657), Color(0xFF120B24)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-    );
-
-    config.foreground = _giftBannerText == null
-        ? null
-        : Positioned(
-            top: 75,
-            left: 16,
-            right: 16,
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Colors.amber, Colors.deepOrangeAccent],
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: const [
-                    BoxShadow(color: Colors.black45, blurRadius: 12),
-                  ],
-                ),
-                child: Text(
-                  _giftBannerText!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ),
-          );
-
-    return SafeArea(
-      child: ZegoUIKitPrebuiltLiveAudioRoom(
-        appID: ZegoConfig.appID,
-        appSign: ZegoConfig.appSign,
-        userID: widget.userID,
-        userName: widget.userName,
-        roomID: widget.roomID,
-        config: config,
-      ),
-    );
-  }
-}
+</body>
+</html>
